@@ -1,14 +1,19 @@
 # setting up basic pygame loop
-from sys import exit
+from importlib.metadata import files
+from sys import exit, displayhook
 import pygame
-from pygame.sprite import collide_rect
 
-import ball  # python file with ball
+#  NEXT:
+#     turn pins and ball into spite classes
+#     calculate score and display
+#     split classes into separate files
+#     calculate position (and size?) based on screen size, then allow screen size to vary
+#     use bowling physic to affect how the pins fall
 
 # starts pygame
 pygame.init()
 
-    # will implement later
+    # allow for full size
 # get screen size
 # infoObject = pygame.display.Info()
 # screen_width = infoObject.current_w
@@ -47,7 +52,7 @@ class Pin:
     def make_visible(self):
         self.visible = True
 
-# holds list of all pins: ctor, getter of list, resets pin visiblity
+# holds list of all pins: ctor, getter of list, resets pin visibility
 class AllPins:
     def __init__(self):
         self.pin_list = []
@@ -86,6 +91,10 @@ while True:
     for event in pygame.event.get():
         # ball move moment with keyboard input
         if event.type == pygame.KEYDOWN:
+            # can close with esc key
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                exit()
             key_down = event.key
         # if key released, ball stops moving
         if event.type == pygame.KEYUP:
@@ -95,12 +104,13 @@ while True:
             pygame.quit()
             exit()
 
-    if key_down == pygame.K_RIGHT:
-        ball_rect_x += 5
-    if key_down == pygame.K_LEFT:
-        ball_rect_x -= 5
-    if key_down == pygame.K_UP:
-        roll = True
+    if not roll: # can only move when not rolling
+        if key_down == pygame.K_RIGHT:
+            ball_rect_x += 5
+        if key_down == pygame.K_LEFT:
+            ball_rect_x -= 5
+        if key_down == pygame.K_UP:
+            roll = True
     if key_down == pygame.K_DOWN:
         allPin.reset()
 
