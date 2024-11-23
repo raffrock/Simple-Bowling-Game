@@ -1,14 +1,16 @@
-# setting up basic pygame loop
-from importlib.metadata import files
-from sys import exit, displayhook
+# from importlib.metadata import files
+from sys import exit
 import pygame
 
 #  NEXT:
+#     calculate score and display (think Bowling Game Kata)
 #     turn pins and ball into spite classes
-#     calculate score and display
 #     split classes into separate files
+#     create falling animation with wait time before pin disappears, delay shooting as well
 #     calculate position (and size?) based on screen size, then allow screen size to vary
 #     use bowling physic to affect how the pins fall
+#     press H to toggle keyboard inputs
+#     press T for tips or another key or likelihood of strike?
 
 # starts pygame
 pygame.init()
@@ -49,7 +51,7 @@ class Pin:
         if pin.y >= ball_y and abs(pin.x - ball_x) <= 30:
             self.visible = False
 
-    def make_visible(self):
+    def makeVisible(self):
         self.visible = True
 
 # holds list of all pins: ctor, getter of list, resets pin visibility
@@ -67,7 +69,7 @@ class AllPins:
 
     def reset(self):
         for pin in self.pin_list:
-            pin.make_visible()
+            pin.makeVisible()
 
     #  detect strike
     def strike(self):
