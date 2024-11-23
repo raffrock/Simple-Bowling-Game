@@ -1,16 +1,56 @@
-# This is a sample Python script.
+# setting up basic pygame loop
+from sys import exit
+import pygame
 
-# Press ⌃F5 to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+# starts pygame
+pygame.init()
+
+    # will implement later
+# get screen size
+# infoObject = pygame.display.Info()
+# screen_width = infoObject.current_w
+# screen_height = infoObject.current_h
+# screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+
+screen = pygame.display.set_mode((800, 800))
+pygame.display.set_caption("Simple Bowling Game")
+    # will implement later
+# pygame.display.set_icon()
+
+intro_font = pygame.font.Font(None,50)
+
+    # change size later, and allow to be run on other computers
+background_surface = pygame.image.load('/Users/rchetata/PycharmProjects/PythonProject/bowling_game_background.png')
+# ball_icon = pygame.image.load('/Users/rchetata/PycharmProjects/PythonProject/ball_icon.png').convert_alpha()
+# bowling_pin_icon = pygame.image.load('/Users/rchetata/PycharmProjects/PythonProject/bowling_pin_icon.png').convert_alpha()
+
+ball_circle = pygame.image.load('/Users/rchetata/PycharmProjects/PythonProject/tiny_ball_icon.png').convert()
+ball_rect = ball_circle.get_rect(center = (300,600))
+
+welcome_text_surface = intro_font.render("Welcome to my Simple Bowling Game!", False, 'Black')
+welcome_text_x = 30
+
+clock = pygame.time.Clock()
+
+while True:
+    # event loop to check for player input
+    for event in pygame.event.get():
+        # if player quits, quit pygame
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+    screen.blit(background_surface,(0,0))
+    screen.blit(welcome_text_surface,(welcome_text_x,20))
+    # moves the text
+    welcome_text_x -= 2
+    if welcome_text_x < -700:
+        welcome_text_x = 800
+
+    screen.blit(ball_circle, ball_rect)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    pygame.display.flip()
+    # pygame.display.update()
+    clock.tick(60)  # limits FPS to 60
