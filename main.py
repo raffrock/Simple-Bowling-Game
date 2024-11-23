@@ -40,18 +40,14 @@ class Pin:
     def isVisible(self):
         return self.visible
 
-    def is_touching(self):
-        return not pygame.Rect.colliderect(self.rect, ball_circle)
-
-    def knock_down(self):
-        # if self.is_touching():
-        #     self.visible = False
-        self.visible = False
+    def isKnockedDown(self, ball_x, ball_y):
+        if pin.y >= ball_y and abs(pin.x - ball_x) <= 30:
+            self.visible = False
 
     def make_visible(self):
         self.visible = True
 
-
+# holds list of all pins: ctor, getter of list, resets pin visiblity
 class AllPins:
     def __init__(self):
         self.pin_list = []
@@ -68,15 +64,17 @@ class AllPins:
         for pin in self.pin_list:
             pin.make_visible()
 
+    #  detect strike
     def strike(self):
         for pin in self.pin_list:
-            if not pin.visible:
+            if pin.visible:
                 return False
         return True
 
 
 welcome_text_surface = intro_font.render("Welcome to my Simple Bowling Game!", False, 'Black')
-welcome_text_x = 30
+strike_text_surface = intro_font.render("All Pins Down!", False, 'Black')
+top_text_x = 30
 
 clock = pygame.time.Clock()
 
@@ -114,18 +112,24 @@ while True:
 
     # displays background and moving welcome text
     screen.blit(background_surface, (0, 0))
-    screen.blit(welcome_text_surface, (welcome_text_x, 20))
-    # moves the text
-    welcome_text_x -= 2
-    if welcome_text_x < -700:
-        welcome_text_x = 800
+    if allPin.strike():
+        screen.blit(strike_text_surface, (top_text_x, 20))
+        # moves the text
+        top_text_x -= 10
+        if top_text_x < -500:
+            top_text_x = 800
+    else:
+        screen.blit(welcome_text_surface, (top_text_x, 20))
+        # moves the text
+        top_text_x -= 2
+        if top_text_x < -700:
+            top_text_x = 800
 
     # draws bowling ball
     pygame.draw.circle(screen, (35, 36, 36), (ball_rect_x, ball_rect_y), 30)
 
     for pin in allPin.getPins():
-        if pin.y >= ball_rect_y and abs(pin.x-ball_rect_x) <= 30 :
-            pin.knock_down()
+        pin.isKnockedDown(ball_rect_x,ball_rect_y)
         if pin.isVisible():
             pygame.draw.rect(screen, "White", pin)
 
