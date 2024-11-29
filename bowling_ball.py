@@ -41,10 +41,12 @@ class Ball(pygame.sprite.Sprite):
         else: # color is purple
             self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_purple.png').convert_alpha()
 
+        self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
+
         # position ball
-        self.rect = self.icon.get_rect()
-        self.rect.x = floor_x / 2
-        self.rect.y = floor_y
+        # self.rect = self.icon.get_rect()
+        # self.rect.x = floor_x / 2
+        # self.rect.y = floor_y
 
         self.x = floor_x / 2
         self.y = floor_y
@@ -52,6 +54,8 @@ class Ball(pygame.sprite.Sprite):
         # variables for reset
         self.reset_pos = floor_y
         self.limit = limit_y
+
+        self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
 
         # speeds
         self.roll_speed = 0
@@ -99,6 +103,7 @@ class Ball(pygame.sprite.Sprite):
         # update icon to be next frame
         path += ".png"
         self.icon = pygame.image.load(path).convert_alpha()
+        self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
 
     # sets roll speed and move speed outside of constructor
     def set_speed(self, r_speed, m_speed):
@@ -135,10 +140,12 @@ class Ball(pygame.sprite.Sprite):
                 self.x += self.move_speed
             if key[pygame.K_UP]:
                 self.if_roll = True
+        # self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
 
     def get_if_roll(self):
         return self.if_roll
 
     def display(self, surface):
         surface.blit(self.icon, (self.x, self.y))
+        self.ball_rect = pygame.Rect(self.x, self.y, 10, 10)
 

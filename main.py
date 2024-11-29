@@ -1,6 +1,7 @@
 # from importlib.metadata import files
 from sys import exit
 import pygame
+import numpy as np
 
 # import files
 import bowling_ball
@@ -50,11 +51,13 @@ top_text_x = 30
 clock = pygame.time.Clock()
 
 # def __init__(self, floor_x, floor_y, limit_y, color):
-ball = bowling_ball.Ball(400, 500, 200, "purple")
+ball = bowling_ball.Ball(400, 600, 300, "purple")
 ball.set_speed(5,5)
 
 # def __init__(self, x, y, row, box_w, box_h)
-pin = pins.Pin(50, 200, 1, 100, 200)
+# pin = pins.Pin(200, 300, 1, 500, 300)
+# pinTwo = pins.Pin(225, 300, 1, 500, 300)
+# pinThree = pins.Pin(250, 300, 1, 500, 300)
 
 while True:
     # event loop to check for player input
@@ -75,15 +78,25 @@ while True:
             pygame.quit()
             exit()
 
-    # displays background and moving welcome text
     screen.blit(background_surface, (0, 0))
+    # screen.fill((250, 250, 250))
 
     ball.move()
 
     if ball.get_if_roll():
         ball.roll()
 
-    pin.display(screen)
+    if not pins.check_for_strike():
+        screen.blit(welcome_text_surface, (top_text_x, 20))
+    else:
+        screen.blit(strike_text_surface, (top_text_x, 20))
+
+    # moves the text
+    top_text_x -= 2
+    if top_text_x < -700:
+        top_text_x = 800
+
+    pins.display_pins(screen, ball.ball_rect)
     ball.display(screen)
 
     pygame.display.flip()
