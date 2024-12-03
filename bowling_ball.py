@@ -55,13 +55,13 @@ class Ball(pygame.sprite.Sprite):
         self.reset_pos = floor_y
         self.limit = limit_y
 
-        self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
-
         # speeds
         self.roll_speed = 0
         self.move_speed = 0
 
         self.turn_counter = 1
+
+        self.roll_count = 0
 
     def purple_animation(self, turn_counter):
         frames_numbers = ["zero", "one","two","three","four","five","six","seven","eigth","nine","ten","eleven","twele","thriteen","fourteen","fifteen"]
@@ -110,6 +110,9 @@ class Ball(pygame.sprite.Sprite):
         self.roll_speed = r_speed
         self.move_speed = m_speed
 
+    def set_limit(self, new_limit):
+        self.limit = new_limit
+
 # rolls ball by para roll_speed (usually 10), and animates roll if purple
     def roll(self):
         self.y -= self.roll_speed
@@ -140,6 +143,11 @@ class Ball(pygame.sprite.Sprite):
                 self.x += self.move_speed
             if key[pygame.K_UP]:
                 self.if_roll = True
+                self.roll_count += 1
+                # reset
+                if self.roll_count > 2:
+                    self.roll_count = 1
+        # self.ball_rect = self.icon.get_rect()
         # self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
 
     def get_if_roll(self):
@@ -147,5 +155,7 @@ class Ball(pygame.sprite.Sprite):
 
     def display(self, surface):
         surface.blit(self.icon, (self.x, self.y))
-        self.ball_rect = pygame.Rect(self.x, self.y, 10, 10)
+        # Rect(left, top, width, height)
+        ball_rect = pygame.Rect(self.x, self.y, 10, 10)
+        pygame.draw.rect(surface, (250,250,250), ball_rect)
 

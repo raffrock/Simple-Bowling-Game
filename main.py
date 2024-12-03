@@ -2,10 +2,16 @@
 from sys import exit
 import pygame
 import numpy as np
+from pygame import RESIZABLE, VIDEORESIZE
 
 # import files
 import bowling_ball
-import pins
+# import pins
+from score_calcuator import Score
+from pins_easy_pick import AllPins
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 #  NEXT:
 #     calculate score and display (think Bowling Game Kata)
@@ -25,6 +31,12 @@ import pins
 #         include music?
 #     press T for tips or another key or likelihood of strike?
 
+
+# new collusion method
+    # save angle of fall, for animation and collusion with other pins
+    # if pin is in front, it can test for collusion with ball
+    # if 1,2,3 are down 5,8,9 can check for ball collusion, otherwise not
+
 # starts pygame
 pygame.init()
 
@@ -41,8 +53,10 @@ pygame.display.set_caption("Simple Bowling Game")
 # pygame.display.set_icon()
 
 intro_font = pygame.font.Font(None, 50)
+score_font = pygame.font.Font(None, 50)
 
-background_surface = pygame.image.load('bowling_game_background.png')
+background_img = pygame.image.load('bowling_game_background.png')
+# background_scene = pygame.display.set_mode((800,800), RESIZABLE)
 
 welcome_text_surface = intro_font.render("Welcome to my Simple Bowling Game!", False, 'Black')
 strike_text_surface = intro_font.render("All Pins Down!", False, 'Black')
@@ -51,13 +65,11 @@ top_text_x = 30
 clock = pygame.time.Clock()
 
 # def __init__(self, floor_x, floor_y, limit_y, color):
-ball = bowling_ball.Ball(400, 600, 300, "purple")
+ball = bowling_ball.Ball(400, 600, 305, "purple")
 ball.set_speed(5,5)
 
-# def __init__(self, x, y, row, box_w, box_h)
-# pin = pins.Pin(200, 300, 1, 500, 300)
-# pinTwo = pins.Pin(225, 300, 1, 500, 300)
-# pinThree = pins.Pin(250, 300, 1, 500, 300)
+new_all_pins = AllPins()
+new_game = Score()
 
 while True:
     # event loop to check for player input
@@ -65,40 +77,54 @@ while True:
         # ball move moment with keyboard input
         if event.type == pygame.KEYDOWN:
             # can close with esc key
+            # if event.key == pygame.KEYUP:
+                # roll_count += 1
+                # logging.debug("roll_count: " + str(roll_count))
+            if event.key == pygame.K_RETURN:
+                if ball.roll_count == 1:
+                    new_game.add_to_turn(new_all_pins.pins_down)
+                if ball.roll_count == 2:
+                    new_game.add_to_turn(new_all_pins.pins_down)
+                    new_all_pins.reset_all()
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
-            # else:
-            #     key_down = event.key
-        # # if key released, ball stops moving
-        # if event.type == pygame.KEYDOWN:
-        #     key_down = None
-        # if player quits, quit pygame
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+        # if event.type == VIDEORESIZE:
+            # background_scene = pygame.display.set_mode(
+                # event.dict['size'], RESIZABLE)
+            # background_scene.blit(pygame.transform.scale(background_img, event.dict['size']), (0, 0))
 
-    screen.blit(background_surface, (0, 0))
+    screen.blit(background_img, (0, 0))
+    # pygame.display.set_mode()
     # screen.fill((250, 250, 250))
+
+    # if not pins.check_for_strike():
+    #     screen.blit(welcome_text_surface, (top_text_x, 20))
+    # else:
+    #     screen.blit(strike_text_surface, (top_text_x, 20))
+
+    score_text = intro_font.render(new_game.return_score_str(), False, 'Black')
+    screen.blit(score_text, (0, 20))
+
+    # moves the text
+    # top_text_x -= 2
+    # if top_text_x < -700:
+    #     top_text_x = 800
 
     ball.move()
 
     if ball.get_if_roll():
         ball.roll()
 
-    if not pins.check_for_strike():
-        screen.blit(welcome_text_surface, (top_text_x, 20))
-    else:
-        screen.blit(strike_text_surface, (top_text_x, 20))
+    # pins.display_pins(screen, ball.ball_rect)
+    new_all_pins.display(screen, ball.x, ball.y)
 
-    # moves the text
-    top_text_x -= 2
-    if top_text_x < -700:
-        top_text_x = 800
-
-    pins.display_pins(screen, ball.ball_rect)
+    # display ball
     ball.display(screen)
 
     pygame.display.flip()
 
-    clock.tick(60)  # 60 FPS
+    clock.tick(100)  # 60 FPS
