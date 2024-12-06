@@ -164,7 +164,8 @@ class AllPins:
                     center_x + pin_space,
                     center_x + pin_space * 3]
 
-        for i in range(9, -1, -1):
+        # for i in range(9, -1, -1):
+        for i in range(0, 10):
             curr_x_val = x_values[i]
             self.all_pins.append(Pin(i+1, curr_x_val + 1, floor_y))
 
@@ -215,8 +216,8 @@ class AllPins:
 
                     # strike possibility
                     if self.pins_down == 1 and (pin.number == 2 or pin.number == 3):
-                        # probability_of_strike = np.random.randint(1, 100)
-                        probability_of_strike = 100
+                        probability_of_strike = np.random.randint(1, 100)
+                        # probability_of_strike = 100
                         if probability_of_strike > 85 and pin.number == 2:
                             self.strike(True, False)
                         elif probability_of_strike > 90 and pin.number == 3:

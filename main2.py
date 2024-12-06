@@ -13,6 +13,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 pygame.init()
 
+# make resizing better
+# add more variety to pin knock down patterns
+
 # get screen size
 # os.environ["SDL_VIDEO_CENTERS"] = '1'
 # info = pygame.display.Info()
@@ -105,28 +108,16 @@ while True:
             new_game.reset_score()
             new_game.game_end = False
             new_all_pins.reset_all()
-            # if new_all_pins.pins_down >= 1:
-            #     done_falling = True
-            #     for pin in new_all_pins.all_pins:
-            #         if pin.falling_countdown > -2:
-            #             done_falling = False
-            #     if done_falling:
-            #         new_all_pins.reset_all()
-            pin_reset = True
+            # pin_reset = True
             new_game.add_to_turn(new_all_pins.pins_down)
         if ball.roll_count == 1:
             new_game.add_to_turn(new_all_pins.pins_down)
+            if new_all_pins.pins_down == 10:
+                new_all_pins.reset_all()
         if ball.roll_count == 2:
             new_game.add_to_turn(new_all_pins.pins_down)
             new_all_pins.reset_all()
-            # if new_all_pins.pins_down >= 1:
-            #     done_falling = True
-            #     for pin in new_all_pins.all_pins:
-            #         if pin.falling_countdown > -2:
-            #             done_falling = False
-            #     if done_falling:
-            #         new_all_pins.reset_all()
-            pin_reset = True
+            # pin_reset = True
 
         # if pin_reset and new_all_pins.pins_down >= 1:
         #     done_falling = True
