@@ -124,7 +124,7 @@ class Pin:
     def test_for_collateral(self):
         probability_of_hit = np.random.randint(1, 100)  # need 80 to hit
         logging.debug("probability of collateral: " + str(probability_of_hit))
-        if self.number in self.potential_knock_downs.keys() and probability_of_hit > 20:
+        if self.number in self.potential_knock_downs.keys() and probability_of_hit > 50:
             # return number of pin to be knocked down
             if self.left:
                 logging.debug("collateral pin: " + str(self.number) + "->" + str(self.potential_knock_downs[self.number][0]))
@@ -215,8 +215,9 @@ class AllPins:
 
                     # strike possibility
                     if self.pins_down == 1 and (pin.number == 2 or pin.number == 3):
-                        probability_of_strike = np.random.randint(1, 100)
-                        if probability_of_strike > 90 and pin.number == 2:
+                        # probability_of_strike = np.random.randint(1, 100)
+                        probability_of_strike = 100
+                        if probability_of_strike > 85 and pin.number == 2:
                             self.strike(True, False)
                         elif probability_of_strike > 90 and pin.number == 3:
                             self.strike(True, False)
