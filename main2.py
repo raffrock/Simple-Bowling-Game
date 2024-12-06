@@ -42,6 +42,13 @@ class BowlingPit:
 # text
 score_font = pygame.font.Font(None, 40)
 # put key instructions
+    # Q to turn off sound effects
+    # shift + Q to turn off music
+    # left and right to move ball
+    # up to shoot/roll
+    # back to reset pins
+    # enter to reset game
+    # Space to hide menu
 instructions_font = pygame.font.Font(None, 10)
 
 # create all elements
@@ -72,10 +79,11 @@ while True:
                 ball.update_x_y(screen_width, screen_height)
                 bowling_pit.update_pit()
                 new_all_pins.reset_size(screen_width/2, screen_height/2+20, bowling_pit.pit_width)
-                # new_all_pins.set_y_value(screen_height/2)
+                # new_all_pins.reset_all()
             # reset game
             if event.key == pygame.K_RETURN:
                 new_game.reset_score()
+                new_all_pins.reset_all()
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
