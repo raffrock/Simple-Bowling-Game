@@ -44,10 +44,6 @@ score_font = pygame.font.Font(None, 40)
 # put key instructions
 instructions_font = pygame.font.Font(None, 10)
 
-# music & sounds
-# ball_crash_sound = pygame.mixer.Sound("ball_pin_collusion.m4a")
-# background_music = pygame.mixer.Sound("crash.wav")
-
 # create all elements
 bowling_pit = BowlingPit()
 bowling_pit.update_pit()
