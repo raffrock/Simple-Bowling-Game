@@ -126,5 +126,4 @@ while True:
     ball.display(screen)
 
     pygame.display.flip()
-
     clock.tick(100)  # 60 FPS

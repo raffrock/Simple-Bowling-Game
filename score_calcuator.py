@@ -8,6 +8,7 @@ class Score:
         self.curr_turn_list = []
         self.curr_turn = 1
         self.frame_list = []
+        self.game_end = False
 
     def add_to_turn(self, pins_down):
         # start new frame
@@ -23,20 +24,24 @@ class Score:
         self.frame_list.append(pins_down)
 
     def return_score_str(self):
-        score_str = ""
-        # for frame in self.frame_list:
-        #     for score in frame:
-        #         if score_str != 10:
-        #             score_str += str(score) + "/"
-        #         else:
-        #             score_str += "X"
-        #     score_str += " "
-        for score in self.frame_list:
-            if score != 10:
-                score_str += str(score) + "/"
-            else:
+        score_str = "Score: "
+        total_score = 0
+        for i in range(0,len(self.frame_list)):
+            if self.frame_list[i] != 10:
+                score_str += str(self.frame_list[i])
+            elif (i+1) % 2 != 0:
                 score_str += "X"
-            score_str += " "
+            else:
+                score_str += "10 |"
+                continue
+            if i % 2 != 0:
+                score_str += " | "
+                total_score += self.frame_list[i]
+            else:
+                score_str += "/"
+        if len(self.frame_list) == 20:
+            self.game_end = True
+            return "Total Score " + str(total_score)
         return score_str
 
     def reset_score(self):

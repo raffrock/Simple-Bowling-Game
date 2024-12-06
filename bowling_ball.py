@@ -3,24 +3,6 @@
 
 import pygame
 
-# # controls to move ball
-# if key_down == pygame.K_RIGHT:
-#     ball_rect_x += 5
-# if key_down == pygame.K_LEFT:
-#     ball_rect_x -= 5
-# if key_down == pygame.K_UP:
-#     roll = True
-#
-# if roll and ball_rect_y > 400:
-#     ball_rect_y -= 10
-# elif ball_rect_y >= 400:
-#     ball_rect_y = 750
-#     roll = False
-#
-# ball_rect_x = 300
-# ball_rect_y = 750
-# roll = False
-
 class Ball(pygame.sprite.Sprite):
     # initializes variables for roll speed and move speed
 
@@ -40,19 +22,14 @@ class Ball(pygame.sprite.Sprite):
             self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_red.png').convert_alpha()
         else: # color is purple
             self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_purple.png').convert_alpha()
-
         self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
 
-        # position ball
-        # self.rect = self.icon.get_rect()
-        # self.rect.x = floor_x / 2
-        # self.rect.y = floor_y
-
-        self.x = floor_x / 2
-        self.y = floor_y
+        # img rect for positioning and collusion
+        self.rect = self.icon.get_rect()
+        self.rect.center = (floor_x / 2 + 50, floor_y - self.icon.get_height() * .2)
 
         # variables for reset
-        self.reset_pos = floor_y
+        self.reset_pos = floor_y - self.icon.get_height()*.2
         self.limit = limit_y
 
         # speeds
@@ -62,6 +39,10 @@ class Ball(pygame.sprite.Sprite):
         self.turn_counter = 1
 
         self.roll_count = 0
+
+        self.restart = False
+        self.visible = True
+        self.visible_countdown = 10
 
     def purple_animation(self, turn_counter):
         frames_numbers = ["zero", "one","two","three","four","five","six","seven","eigth","nine","ten","eleven","twele","thriteen","fourteen","fifteen"]
@@ -105,6 +86,12 @@ class Ball(pygame.sprite.Sprite):
         self.icon = pygame.image.load(path).convert_alpha()
         self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
 
+    def update_x_y(self, x, y):
+        # self.rect.x = x / 2
+        # self.rect.y = y - self.icon.get_height()*.8
+        self.rect.center = (x / 2 + 50, y - self.icon.get_height() * .2)
+        self.reset_pos = y - self.icon.get_height() * .2
+
     # sets roll speed and move speed outside of constructor
     def set_speed(self, r_speed, m_speed):
         self.roll_speed = r_speed
@@ -115,7 +102,7 @@ class Ball(pygame.sprite.Sprite):
 
 # rolls ball by para roll_speed (usually 10), and animates roll if purple
     def roll(self):
-        self.y -= self.roll_speed
+        self.rect.centery -= self.roll_speed
 
         if self.turn_counter > 15:
             self.turn_counter = 0
@@ -127,26 +114,31 @@ class Ball(pygame.sprite.Sprite):
             self.purple_animation(self.turn_counter)
 
         # reset to shooting position when collusion
-        if self.y <= self.limit:
+        if self.rect.centery < self.limit:
+            self.restart = True
             self.if_roll = False
-            self.y = self.reset_pos
+            self.visible = False
+            self.rect.centery = self.reset_pos
             if self.color == "purple":
                 self.purple_animation(1)
 
     # move function
     def move(self):
         key = pygame.key.get_pressed()
+        self.restart = False
+        if True in key:
+            self.visible = True
         if not self.if_roll:
             if key[pygame.K_LEFT]:
-                self.x -= self.move_speed
+                self.rect.centerx -= self.move_speed
             if key[pygame.K_RIGHT]:
-                self.x += self.move_speed
+                self.rect.centerx += self.move_speed
             if key[pygame.K_UP]:
                 self.if_roll = True
                 self.roll_count += 1
-                # reset
                 if self.roll_count > 2:
                     self.roll_count = 1
+                # reset
         # self.ball_rect = self.icon.get_rect()
         # self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
 
@@ -154,8 +146,16 @@ class Ball(pygame.sprite.Sprite):
         return self.if_roll
 
     def display(self, surface):
-        surface.blit(self.icon, (self.x, self.y))
-        # Rect(left, top, width, height)
-        ball_rect = pygame.Rect(self.x, self.y, 10, 10)
-        pygame.draw.rect(surface, (250,250,250), ball_rect)
+        # ball_rect = pygame.Rect(0, 0, 40, 20)
+        # ball_rect.center = (self.rect.centerx, self.rect.centery)
+        # pygame.draw.rect(surface, (0,250,250), self.rect)
+        # if self.restart:
+            # pygame.time.wait(130)
+        if self.visible or self.visible_countdown <= 0:
+            self.visible_countdown = 20
+            self.visible = True
+            surface.blit(self.icon, self.rect)
+        if not self.visible:
+            self.visible_countdown -= 1
+        # pygame.draw.rect(surface, (0, 0, 250), ball_rect)
 
