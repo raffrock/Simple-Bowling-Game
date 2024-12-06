@@ -114,6 +114,7 @@ while True:
             new_game.add_to_turn(new_all_pins.pins_down)
             if new_all_pins.pins_down == 10:
                 new_all_pins.reset_all()
+                ball.roll_count = 0
         if ball.roll_count == 2:
             new_game.add_to_turn(new_all_pins.pins_down)
             new_all_pins.reset_all()
