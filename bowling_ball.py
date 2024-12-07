@@ -14,9 +14,11 @@ class Ball():
         self.color = color
 
         if color == "Blue":
-            self.icon = pygame.image.load('ball_icon_colors/ball_icon_blue.png').convert_alpha()
+            self.icon = pygame.image.load('blue_ball_animation/ball_icon_blue_one.png').convert_alpha()
         elif color == "Red":
             self.icon = pygame.image.load('ball_icon_colors/ball_icon_red.png').convert_alpha()
+        elif color == "Green":
+            self.icon = pygame.image.load('green_ball_animation/ball_icon_green_one.png')
         else: # color is purple
             self.icon = pygame.image.load('ball_icon_colors/ball_icon_purple.png').convert_alpha()
         self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
@@ -42,9 +44,15 @@ class Ball():
         self.visible = True
         self.visible_countdown = 10
 
-    def purple_animation(self, turn_counter):
-        frames_numbers = ["zero", "one","two","three","four","five","six","seven","eigth","nine","ten","eleven","twele","thriteen","fourteen","fifteen"]
-        path = "purple_ball_animation/ball_icon_purple_"
+    def color_animation(self, turn_counter):
+        frames_numbers = ["zero", "one","two","three","four","five","six","seven","eigth","nine","ten","eleven","twelve","thriteen","fourteen","fifteen"]
+
+        if self.color == "Green":
+            path = "green_ball_animation/ball_icon_green_"
+        elif self.color == "Blue":
+            path = "blue_ball_animation/ball_icon_blue_"
+        else:
+            path = "purple_ball_animation/ball_icon_purple_"
 
         if turn_counter == 1:
             path += frames_numbers[1]
@@ -89,6 +97,14 @@ class Ball():
         self.reset_pos_x = self.rect.centerx
         self.reset_pos_y = self.rect.centery
 
+    def set_color(self, new_color):
+        if new_color == "Green":
+            self.color = "Green"
+        elif new_color == "Blue":
+            self.color = "Blue"
+        else:
+            self.color = "Purple"
+
     # sets roll speed and move speed outside of constructor
     def set_speed(self, r_speed, m_speed):
         self.roll_speed = r_speed
@@ -107,8 +123,8 @@ class Ball():
         self.turn_counter += 1
 
         # add animation for purple ball
-        if self.color == "purple":
-            self.purple_animation(self.turn_counter)
+        # if self.color == "purple":
+        self.color_animation(self.turn_counter)
 
         # reset to shooting position when collusion
         if self.rect.centery < self.limit:
@@ -116,13 +132,14 @@ class Ball():
             self.if_roll = False
             self.visible = False
             self.rect.center = (self.reset_pos_x, self.reset_pos_y)
-            if self.color == "purple":
-                self.purple_animation(1)
+            # if self.color == "purple":
+            self.color_animation(1)
 
     # move function
     def move(self):
         key = pygame.key.get_pressed()
         self.restart = False
+        self.color_animation(1)
         if True in key:
             self.visible = True
         if not self.if_roll:

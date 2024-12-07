@@ -19,6 +19,7 @@ pygame.init()
     # add ball rolling sound effect
     # redraw background
     # title screen/intro with ability to pick ball color?
+    # remove log
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((800, 800), pygame.RESIZABLE) # has starting size
@@ -59,14 +60,17 @@ toggle_instructions = False
 
 # create all elements
 pit = BowlingPit()
-ball = Ball(screen_width, screen_height, screen_height/2+30, "purple")
+ball = Ball(screen_width, screen_height, screen_height/2+30, "Purple")
 ball.set_speed(6,5)
 pins = AllPins((screen_width / 2), screen_height / 2 + 20, pit.width)
 game = Score()
 
+# change ball color
+ball_color_count = 0
+
 # allows for delay for pin reset
 pin_reset = False
-pin_reset_countdown = 10
+pin_reset_countdown = 15
 
 # plays music, and allows to be turned off
 pygame.mixer.music.load('game_music.mp3')
@@ -105,6 +109,17 @@ while True:
                     pygame.mixer.music.play(-1)
                 else:
                     pygame.mixer.music.stop()
+            # change ball color
+            if event.key == pygame.K_c:
+                ball_color_count += 1
+                logging.debug("ball_color_count: " + str(ball_color_count))
+                if ball_color_count == 1:
+                    ball.set_color("Green")
+                elif ball_color_count == 2:
+                    ball.set_color("Blue")
+                elif ball_color_count == 3:
+                    ball_color_count = 0 # reset
+                    ball.set_color("Purple")
         # if window resized, call all update functions:
         if event.type == pygame.VIDEORESIZE:
             screen_width, screen_height = screen.get_size()
@@ -123,7 +138,7 @@ while True:
         if pin_reset_countdown > 0:
             pin_reset_countdown -= 1
         else:
-            pin_reset_countdown = 10
+            pin_reset_countdown = 15
             pin_reset = False
             pins.reset_all()
 

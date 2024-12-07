@@ -10,9 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class Pin:
 
-    # pin input information: position, number
-    # hidden information: active, down, fall direction
-
+    # maps which pins can knock down others
     potential_knock_downs = { # left, right
         1 : [2,3],
         2 : [4,5],
