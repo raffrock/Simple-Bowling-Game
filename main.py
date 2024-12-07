@@ -1,129 +1,171 @@
-# from importlib.metadata import files
+import os
 from sys import exit
 import pygame
-import numpy as np
-from pygame import RESIZABLE, VIDEORESIZE
 
 # import files
-import bowling_ball
-# import pins
+from bowling_ball import Ball
 from score_calcuator import Score
-from pins_easy_pick import AllPins
+from pins import AllPins
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-#  NEXT:
-#     calculate score and display (think Bowling Game Kata)
-#     turn pins and ball into spite classes
-#     create background in python so it can be resize?
-#     create floor for ball to "roll over off" and pins to stand on?
-#     create new background
-#     split classes into separate files
-#     create falling animation with wait time before pin disappears, delay shooting as well
-#     calculate position (and size?) based on screen size, then allow screen size to vary
-#     use bowling physic to affect how the pins fall
-#         use all 10 pins and find probability of what pins fall based on pin hit
-#         store options as dict then randomize pick
-#         or if there are patterns, use a function calcuate which pins should fall
-#     press H to toggle keyboard inputs
-#     press S for settings
-#         include music?
-#     press T for tips or another key or likelihood of strike?
-
-
-# new collusion method
-    # save angle of fall, for animation and collusion with other pins
-    # if pin is in front, it can test for collusion with ball
-    # if 1,2,3 are down 5,8,9 can check for ball collusion, otherwise not
-
-# starts pygame
 pygame.init()
 
-    # allow for full size
-# get screen size
-# infoObject = pygame.display.Info()
-# screen_width = infoObject.current_w
-# screen_height = infoObject.current_h
-# screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-
-screen = pygame.display.set_mode((800, 800))
-pygame.display.set_caption("Simple Bowling Game")
-    # will implement later
-# pygame.display.set_icon()
-
-intro_font = pygame.font.Font(None, 50)
-score_font = pygame.font.Font(None, 50)
-
-background_img = pygame.image.load('bowling_game_background.png')
-# background_scene = pygame.display.set_mode((800,800), RESIZABLE)
-
-welcome_text_surface = intro_font.render("Welcome to my Simple Bowling Game!", False, 'Black')
-strike_text_surface = intro_font.render("All Pins Down!", False, 'Black')
-top_text_x = 30
+#   WHAT TO WORK ON NEXT:
+    # make resizing better (ball and pins)
+    # add more variety to pin knock down patterns
+    # figure out how to display instructions_text
+    # add ball rolling sound effect
+    # redraw background
+    # title screen/intro with ability to pick ball color?
 
 clock = pygame.time.Clock()
+screen = pygame.display.set_mode((800, 800), pygame.RESIZABLE) # has starting size
+screen_width, screen_height = screen.get_size()
 
-# def __init__(self, floor_x, floor_y, limit_y, color):
-ball = bowling_ball.Ball(400, 600, 305, "purple")
-ball.set_speed(5,5)
+# background
+game_background = screen.copy()
+game_background.fill("White")
+background_img = pygame.image.load('bowling_game_background.png')
 
-new_all_pins = AllPins()
-new_game = Score()
+pygame.display.set_caption("Simple Bowling Game")
+
+# create bowling pit class to call update function later
+class BowlingPit:
+    def __init__(self):
+        self.width, self.height = screen_width * .4, screen_height * .2
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = ((screen_width / 2), (screen_height / 2))
+
+    def update_pit(self):
+        self.width, self.height = screen_width * .4, screen_height * .2
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = ((screen_width / 2), (screen_height / 2))
+
+# text
+score_font = pygame.font.Font(None, 40)
+# key instructions
+    # P to turn off sound
+    # left and right to move ball
+    # up to shoot/roll
+    # back to reset pins
+    # enter to reset game
+    # Space to hide instructions
+    # delete to close game
+instructions_font = pygame.font.Font(None, 40)
+instructions_text = instructions_font.render('Left and Right to move ball.\nUp to roll.\nBack to reset pins.\nEnter to reset game.\nSpace to toggle instructions.\nP to turn off sound.', False,"Black")
+toggle_instructions = False
+
+# create all elements
+pit = BowlingPit()
+ball = Ball(screen_width, screen_height, screen_height/2+30, "purple")
+ball.set_speed(6,5)
+pins = AllPins((screen_width / 2), screen_height / 2 + 20, pit.width)
+game = Score()
+
+# allows for delay for pin reset
+pin_reset = False
+pin_reset_countdown = 10
+
+# plays music, and allows to be turned off
+pygame.mixer.music.load('game_music.mp3')
+pygame.mixer.music.play(-1)
+toggle_sound = True
 
 while True:
-    # event loop to check for player input
     for event in pygame.event.get():
-        # ball move moment with keyboard input
         if event.type == pygame.KEYDOWN:
-            # can close with esc key
-            # if event.key == pygame.KEYUP:
-                # roll_count += 1
-                # logging.debug("roll_count: " + str(roll_count))
-            if event.key == pygame.K_RETURN:
-                if ball.roll_count == 1:
-                    new_game.add_to_turn(new_all_pins.pins_down)
-                if ball.roll_count == 2:
-                    new_game.add_to_turn(new_all_pins.pins_down)
-                    new_all_pins.reset_all()
+            # quit with backspace key
+            if event.key == pygame.K_BACKSPACE:
+                pygame.quit()
+                exit()
+            # show/hide instructions
+            if event.key == pygame.K_SPACE:
+                toggle_instructions = not toggle_instructions
+                if toggle_instructions:
+                    screen.blit(instructions_text, (0, 0))
+            # return screen to default size and update position of everything
             if event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                exit()
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-        # if event.type == VIDEORESIZE:
-            # background_scene = pygame.display.set_mode(
-                # event.dict['size'], RESIZABLE)
-            # background_scene.blit(pygame.transform.scale(background_img, event.dict['size']), (0, 0))
+                screen_width, screen_height = 800, 800
+                background_scale = (screen_width, screen_height)
+                background_img = pygame.transform.scale(background_img, background_scale)
+                ball.update_x_y(screen_width, screen_height)
+                pit.update_pit()
+                pins.reset_size(screen_width / 2, screen_height / 2 + 20, pit.width)
+            # reset game
+            if event.key == pygame.K_RETURN:
+                game.reset_score()
+                pins.reset_all()
+            # turn off music and sound effects with p
+            if event.key == pygame.K_p:
+                toggle_sound = not toggle_sound
+                pins.toggle_sound()
+                if toggle_sound:
+                    pygame.mixer.music.play(-1)
+                else:
+                    pygame.mixer.music.stop()
+        # if window resized, call all update functions:
+        if event.type == pygame.VIDEORESIZE:
+            screen_width, screen_height = screen.get_size()
+            background_scale = (screen_width, screen_height)
+            background_img = pygame.transform.scale(background_img, background_scale)
+            ball.update_x_y(screen_width, screen_height)
+            pit.update_pit()
+            pins.reset_size(screen_width / 2, screen_height / 2 + 20, pit.width)
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+    # controls pin reset delay
+    if pin_reset:
+        logging.debug("pin_reset: " + str(pin_reset_countdown))
+        if pin_reset_countdown > 0:
+            pin_reset_countdown -= 1
+        else:
+            pin_reset_countdown = 10
+            pin_reset = False
+            pins.reset_all()
+
+
+    if ball.restart:
+        if game.game_end:
+            # reset after end of game (10 frames)
+            game.reset_score()
+            game.game_end = False
+            game.add_to_turn(pins.pins_down)
+            if pins.pins_down == 10:
+                ball.roll_count = 0
+            pin_reset = True
+        elif ball.roll_count == 1:
+            game.add_to_turn(pins.pins_down)
+            # reset after strike
+            if pins.pins_down == 10:
+                ball.roll_count = 0
+                pin_reset = True
+        if ball.roll_count == 2:
+            game.add_to_turn(pins.pins_down)
+            # reset after turn (2 rolls if not strike)
+            pin_reset = True
 
     screen.blit(background_img, (0, 0))
-    # pygame.display.set_mode()
-    # screen.fill((250, 250, 250))
+    if toggle_instructions:
+        screen.blit(instructions_text, (0, 0))
 
-    # if not pins.check_for_strike():
-    #     screen.blit(welcome_text_surface, (top_text_x, 20))
-    # else:
-    #     screen.blit(strike_text_surface, (top_text_x, 20))
+        # to check if pit is in correct position
+    # pygame.draw.rect(screen, "black", bowling_pit.rect)
 
-    score_text = intro_font.render(new_game.return_score_str(), False, 'Black')
-    screen.blit(score_text, (0, 20))
-
-    # moves the text
-    # top_text_x -= 2
-    # if top_text_x < -700:
-    #     top_text_x = 800
+    score_text = score_font.render(game.return_score_str(), False, 'Black')
+    screen.blit(score_text, (10, 20))
 
     ball.move()
 
     if ball.get_if_roll():
         ball.roll()
 
-    # pins.display_pins(screen, ball.ball_rect)
-    new_all_pins.display(screen, ball.x, ball.y)
-
     # display ball
+    pins.display(screen, ball.rect.centerx, ball.rect.centery)
     ball.display(screen)
 
     pygame.display.flip()
-    clock.tick(100)  # 60 FPS
+    clock.tick(60)  # 60 FPS

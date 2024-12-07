@@ -3,33 +3,31 @@
 
 import pygame
 
-class Ball(pygame.sprite.Sprite):
+class Ball():
     # initializes variables for roll speed and move speed
 
     # if rolling
     if_roll = False
 
     def __init__(self, floor_x, floor_y, limit_y, color):
-        # calls sprite constructor
-        pygame.sprite.Sprite.__init__(self)
-
         # save color for animation
         self.color = color
 
         if color == "Blue":
-            self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_blue.png').convert_alpha()
+            self.icon = pygame.image.load('ball_icon_colors/ball_icon_blue.png').convert_alpha()
         elif color == "Red":
-            self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_red.png').convert_alpha()
+            self.icon = pygame.image.load('ball_icon_colors/ball_icon_red.png').convert_alpha()
         else: # color is purple
-            self.icon = pygame.image.load('/Users/rchetata/PycharmProjects/Simple_Bowling_Game/ball_icon_colors/ball_icon_purple.png').convert_alpha()
+            self.icon = pygame.image.load('ball_icon_colors/ball_icon_purple.png').convert_alpha()
         self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
 
         # img rect for positioning and collusion
         self.rect = self.icon.get_rect()
-        self.rect.center = (floor_x / 2 + 50, floor_y - self.icon.get_height() * .2)
+        self.rect.center = (floor_x / 2 + 10, floor_y - self.icon.get_height() * .2)
 
         # variables for reset
-        self.reset_pos = floor_y - self.icon.get_height()*.2
+        self.reset_pos_x = self.rect.centerx
+        self.reset_pos_y = self.rect.centery
         self.limit = limit_y
 
         # speeds
@@ -46,7 +44,7 @@ class Ball(pygame.sprite.Sprite):
 
     def purple_animation(self, turn_counter):
         frames_numbers = ["zero", "one","two","three","four","five","six","seven","eigth","nine","ten","eleven","twele","thriteen","fourteen","fifteen"]
-        path = "/Users/rchetata/PycharmProjects/Simple_Bowling_Game/purple_ball_animation/ball_icon_purple_"
+        path = "purple_ball_animation/ball_icon_purple_"
 
         if turn_counter == 1:
             path += frames_numbers[1]
@@ -87,10 +85,9 @@ class Ball(pygame.sprite.Sprite):
         self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
 
     def update_x_y(self, x, y):
-        # self.rect.x = x / 2
-        # self.rect.y = y - self.icon.get_height()*.8
-        self.rect.center = (x / 2 + 50, y - self.icon.get_height() * .2)
-        self.reset_pos = y - self.icon.get_height() * .2
+        self.rect.center = (x / 2 + 10, y - self.icon.get_height() * .2)
+        self.reset_pos_x = self.rect.centerx
+        self.reset_pos_y = self.rect.centery
 
     # sets roll speed and move speed outside of constructor
     def set_speed(self, r_speed, m_speed):
@@ -118,7 +115,7 @@ class Ball(pygame.sprite.Sprite):
             self.restart = True
             self.if_roll = False
             self.visible = False
-            self.rect.centery = self.reset_pos
+            self.rect.center = (self.reset_pos_x, self.reset_pos_y)
             if self.color == "purple":
                 self.purple_animation(1)
 
@@ -138,24 +135,18 @@ class Ball(pygame.sprite.Sprite):
                 self.roll_count += 1
                 if self.roll_count > 2:
                     self.roll_count = 1
-                # reset
-        # self.ball_rect = self.icon.get_rect()
-        # self.ball_rect = pygame.Rect(self.x, self.y, 20, 20)
 
     def get_if_roll(self):
         return self.if_roll
 
     def display(self, surface):
-        # ball_rect = pygame.Rect(0, 0, 40, 20)
-        # ball_rect.center = (self.rect.centerx, self.rect.centery)
-        # pygame.draw.rect(surface, (0,250,250), self.rect)
-        # if self.restart:
-            # pygame.time.wait(130)
         if self.visible or self.visible_countdown <= 0:
             self.visible_countdown = 20
             self.visible = True
             surface.blit(self.icon, self.rect)
         if not self.visible:
             self.visible_countdown -= 1
+
+            # show rect to see to help check collusion
         # pygame.draw.rect(surface, (0, 0, 250), ball_rect)
 

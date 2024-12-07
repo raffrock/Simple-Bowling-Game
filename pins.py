@@ -1,182 +1,17 @@
-# class for pins intended to create pin objects
-# display several pin objects
-# detention collusion and disappear
-# collect information for score reporting ex. areAllPinsDown() -> bool
+# Pin creates pins that test for ball collusion and whose fall direction is decided by collusion object's position
+# AllPins to stores and control all pins, including reset and collateral falls
 
 import pygame
 import numpy as np
 import math
-
-# for conlog statements
+    # for conlog statements
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-# tips
-    # can use scale_by() to scale rectangles
+class Pin:
 
-# use percentages to calculate size and spacing
-# 800
-
-class Pin(pygame.sprite.Sprite):
-    # list the colors for the four different rows
-    fall_angle_left = [0, 45, 90]
-    fall_angle_right = [0, 135, 180]
-
-    def __init__(self, x, y, row, number, box_w, box_h): # takes in height and width of box that contains pins
-        # calls sprite constructor
-        pygame.sprite.Sprite.__init__(self)
-
-        # decide width and height based on size of bowling pit
-        # 7 pins visible, then add spacing (6 spaces between + 7 pins)
-        self.width = box_w / 7  #- (box_w * 17)
-        # self.height = box_h * .9
-        self.height = 20
-        # self.pin_size = (self.width, self.height)
-
-        self.image = pygame.image.load('Simple-Bowling-Game/pin_icon copy.png')
-        self.image = pygame.transform.rotozoom(self.image, 0, .6)
-        self.image_rotate = self.image
-        # self.image = pygame.transform.scale(self.image, self.pin_size)
-
-        self.x = x
-        self.y = y
-
-        self.fall_x = x
-        self.fall_y = y
-
-        # holds rect and positions pin based on inputs
-        # self.pin_rect = pygame.Rect(self.x + (self.width // 2), self.y, self.width, self.height)
-        self.pin_rect = self.image.get_rect()
-
-        # save row and number
-        self.row = row
-        self.number = number
-
-        self.down = False  # bool is pin is down or now
-        self.falling = 0 # countUP of fall
-        self.fall_direction = -1  # holds fall direction
-
-        # holds direction and angle of fall
-        self.left = False
-        self.right = False
-        self.fall_angle = 0
-
-    # get x and y values for pin
-    def get_x(self):
-        return self.fall_x # most current value for x
-    def get_y(self):
-        return self.fall_y
-
-    def display(self, surface, ball_rect):
-        key = pygame.key.get_pressed()
-        if key[pygame.K_DOWN]:
-            self.reset()
-            self.falling = 0 # reset count, use for animation later
-
-        if not self.down:
-            surface.blit(self.image, (self.x, self.y))
-        elif self.down and self.falling <= 10:
-            # self.falling -= 1
-            if self.fall_direction > 0:
-                self.fall_x -= 5
-                self.image_rotate = pygame.transform.rotate(self.image_rotate, (180-(self.falling*15)) )
-                self.pin_rect = self.image_rotate.get_rect()
-                surface.blit(self.image_rotate, (self.fall_x, self.fall_y))
-            if self.fall_direction < 0:
-                self.fall_x += 5
-                self.image_rotate = pygame.transform.rotate(self.image_rotate, (90+(self.falling*15)) )
-                # self.pin_rect = self.image_rotate.get_rect()
-                surface.blit(self.image_rotate, (self.fall_x, self.fall_y))
-            self.falling += 1
-        # self.pin_rect = pygame.Rect(self.fall_x + (self.width // 2), self.fall_y, self.width, self.height)
-        else:
-            self.pin_rect = self.image_rotate.get_rect()
-            # self.pin_rect = pygame.Rect(self.x + (self.width // 2), self.y, self.width, self.height)
-        pygame.draw.rect(surface, (0, 0, 0), self.pin_rect)
-
-    def reset(self):
-        self.down = False
-        self.fall_x = self.x
-        self.fall_y = self.y
-        self.fall_angle = 0
-        self.fall_direction = 0
-        self.left = False
-        self.right = False
-        self.image_rotate = self.image
-
-    def test_for_collusion(self, collusion_rect):
-        # should only work if the pin is not front of another
-        return pygame.Rect.colliderect(self.pin_rect, collusion_rect)
-
-    # def test_for_collusion(self, collusion_rect):
-    #
-
-    # flags that pin is knocked down, then saves the angle of the fall
-        # >0 falls right, >0 falls left, 0 falls straight back
-    def knock_down(self, collusion_object):
-        self.down = True
-
-        self.fall_direction = self.pin_rect.centerx - collusion_object.centerx
-        # prompts fall_down animation
-
-    def get_fall_angle(self, collusion_object_x, collusion_object_y):
-        # stores delta x and y for inverse tan
-        delta_x = 0
-        delta_y = 0
-        if self.x > collusion_object_x:
-            self.right = True
-            delta_x = self.x - collusion_object_x
-        elif self.x < collusion_object_x:
-            self.left = True
-            delta_x = collusion_object_x - self.x
-        else:
-            # falls straight
-            return 0
-        delta_y = self.y - collusion_object_y
-
-        return math.atan((delta_x / delta_y))
-
-"""
-  7   8   9  10
-    4   5   6
-      2   3
-        1
-"""
-# create all pins
-# pin1 = Pin(175, 300, 1, 1, 500, 300)
-# pin2 = Pin(133, 300, 2, 2, 500, 300)
-# pin3 = Pin(217, 300, 2, 3, 500, 300)
-# pin4 = Pin(91, 300, 3, 4, 500, 300)
-# pin5 = Pin(175, 300, 3, 5, 500, 300)
-# pin6 = Pin(250, 300, 3, 6, 500, 300)
-# pin7 = Pin(50, 300, 4, 7, 500, 300)
-# pin8 = Pin(133, 300, 4,8, 500, 300)
-# pin9 = Pin(217, 300, 4, 9,500, 300)
-# pin10 = Pin(300, 300, 4, 10,500, 300)
-pin1 = Pin(170, 300, 1, 1, 500, 300)
-pin2 = Pin(130, 300, 2, 2, 500, 300)
-pin3 = Pin(210, 300, 2, 3, 500, 300)
-pin4 = Pin(91, 300, 3, 4, 500, 300)
-pin5 = Pin(175, 300, 3, 5, 500, 300)
-pin6 = Pin(250, 300, 3, 6, 500, 300)
-pin7 = Pin(50, 300, 4, 7, 500, 300)
-pin8 = Pin(133, 300, 4,8, 500, 300)
-pin9 = Pin(217, 300, 4, 9,500, 300)
-pin10 = Pin(300, 300, 4, 10,500, 300)
-
-all_pins = [pin1,pin2,pin3,pin4,pin5,pin6,pin7,pin8,pin9,pin10]
-
-"""
-  7   8   9  10
-    4   5   6
-      2   3
-        1
-"""
-
-def fall_impact(pin):
-    probability_of_hit = np.random.randint(1,100) # need 100 to hit
-    logging.debug("probability_of_hit: " + str(probability_of_hit))
-    logging.debug("first fall_direction: " + str(pin.fall_direction))
+    # pin input information: position, number
+    # hidden information: active, down, fall direction
 
     potential_knock_downs = { # left, right
         1 : [2,3],
@@ -184,115 +19,262 @@ def fall_impact(pin):
         3 : [5,6],
         4 : [7,8],
         5 : [8,9],
-        6 : [9,10]
+        6 : [9,10],
     }
-    # if probability_of_hit > 90 and all_pins_up() == True and (all_pins.index(pin) == 1 or all_pins.index(pin) == 2): # hit 2 and 3 pin, possible strike
-    # FIX: currently, strike is not possible
-    if all_pins_up() == True and (all_pins.index(pin) == 1 or all_pins.index(pin) == 2): # hit 2 and 3 pin, possible strike
-        strike()
-    elif probability_of_hit < 20: # likelihood of hitting other pins
-        if pin.row == 1 or pin.row == 2: # in this program, pins fall backward so other row 1 and 2 can hit other pins
-            logging.debug("fall_direction: " + str(pin.fall_direction))
-            if pin.fall_direction < 0:
-                # fall left
-                pin_hit = potential_knock_downs[all_pins.index(pin)][0]-1 # get number of pin hit
-                logging.debug("pin hit: " + str(pin_hit))
-                if not all_pins[pin_hit].down: # if pin hasn't already been hit
-                    all_pins[pin_hit].knock_down(pin.pin_rect)
-            elif pin.fall_direction > 0:
-                # fall right
-                pin_hit = potential_knock_downs[all_pins.index(pin)][1]-1 # get number of pin hit
-                logging.debug("pin hit: " + str(pin_hit))
-                if not all_pins[pin_hit].down: # if pin hasn't already been hit
-                    all_pins[pin_hit].knock_down(pin.pin_rect)
-                # else:
-                    # fall straight
-                    # not including right now, will need to add center values to potential_knock_downs
-                    # and will need a another way to track if pin is currently falling or just fell
 
-            pin.fall_direction = 0 # pin is not falling, so there is no direction
+    def __init__(self, number, x, y):
+        self.image = pygame.image.load('pin_icon_positions/pin_icon_0.png')
+        self.image = pygame.transform.rotozoom(self.image, 0, .65)
+        self.image_rotate = self.image.copy()
+        self.pin_height = self.image.get_height()
+        self.pin_width = self.image.get_width()
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y+self.pin_height//2)
+        self.reset_rect = self.rect
+        self.reset_rect.center = self.rect.center
 
-def display_pins(surface, ball_rect):
-    for display_pin in all_pins:
-        if display_pin.test_for_collusion(ball_rect) and display_pin.number not in [5,8,9]:
-            display_pin.knock_down(ball_rect)
-        # if covered pins are revealed
-        elif display_pin.test_for_collusion(ball_rect) and ((display_pin.number == 5 and all_pins[0].down) or (display_pin.number == 8 and all_pins[1].down) or (display_pin.number == 9 and all_pins[2].down)):
-            display_pin.knock_down(ball_rect)
-        display_pin.display(surface, ball_rect)
-        # if display_pin.down: # works because fall_direction is set to zero after the pin knocks another
-        if display_pin.down and display_pin.falling == 3: # just started falling
-            fall_impact(display_pin)
+        self.number = number
 
-def check_for_strike():
-    for pin in all_pins:
-        if not pin.down:
-            return False
-    return True
+        self.pin_range_low = self.rect.centerx - self.pin_width/7
+        self.pin_range_high = self.rect.centerx + self.pin_width/7 + 20 # to off-set ball being off center
 
-def all_pins_up():
-    for pin in all_pins:
-        if pin.down:
-            return False
-    return True
+        self.down = False
+        self.fall_direction = "none"
+        if number in [5,8,9]:
+            self.active = False
+        else:
+            self.active = True
 
-def strike():
-    for pin in all_pins:
-        pin.down = True
+        self.left = False
+        self.right = False
+        self.falling_countdown = 0
 
-# allPins.add()
+    def knock_down(self, object_x):
+        self.active = False
+        self.down = True
+        self.falling_countdown = 10
 
-# if turns into sprite, can use multiple rectangles and better detect collusion
-# class Pin:
-#     def __init__(self, x, y):
-#         self.x = x
-#         self.y = y
-#         self.rect = pygame.Rect(x, y, 20, 30)
-#         self.visible = True
-#
-#     def isVisible(self):
-#         return self.visible
-#
-#     def isKnockedDown(self, ball_x, ball_y):
-#         if pin.y >= ball_y and abs(pin.x - ball_x) <= 30:
-#             self.visible = False
-#
-#     def makeVisible(self):
-#         self.visible = True
+        # decide left or right based on position of collusion object
+        if self.rect.centerx > object_x: # to left of pin
+            self.left = True
+        elif self.rect.centerx < object_x:
+            self.right = True
+        # else straight -> falls straight back
 
-# holds list of all pins: ctor, getter of list, resets pin visibility
-# class AllPins:
-#     def __init__(self):
-#         self.pin_list = []
-    #     self.pin_list.append(Pin(310, 410))
-    #     self.pin_list.append(Pin(450, 410))
-    #     self.pin_list.append(Pin(345, 420))
-    #     self.pin_list.append(Pin(415, 420))
-    #     self.pin_list.append(Pin(380, 430))
-    #
-    # def getPins(self):
-    #     return self.pin_list
-    #
-    # def reset(self):
-    #     for pin in self.pin_list:
-    #         pin.makeVisible()
-    #
-    # #  detect strike
-    # def strike(self):
-    #     for pin in self.pin_list:
-    #         if pin.visible:
-    #             return False
-    #     return True
+    def reset(self):
+        if self.number in [5,8,9]:
+            self.active = False
+        else:
+            self.active = True
+        self.down = False
+        self.image_rotate = self.image.copy()
+        self.left = False
+        self.right = False
+        self.falling_countdown = 0
 
-    # if all_pins.strike():
-    #     screen.blit(strike_text_surface, (top_text_x, 20))
-    #     # moves the text
-    #     top_text_x -= 10
-    #     if top_text_x < -500:
-    #         top_text_x = 800
-    # else:
-    #     screen.blit(welcome_text_surface, (top_text_x, 20))
-    #     # moves the text
-    #     top_text_x -= 2
-    #     if top_text_x < -700:
-    #         top_text_x = 800
+        self.rect.center = self.reset_rect.center
+
+    def pin_animation(self):
+        path = "pin_icon_positions/pin_icon_"
+        if self.falling_countdown == 5:
+            path += "1.png"
+        elif self.falling_countdown == 4:
+            path += "2.png"
+        elif self.falling_countdown == 3:
+            path += "3.png"
+        elif self.falling_countdown == 2:
+            path += "4.png"
+        else:
+            path += "5.png"
+        self.image_rotate = pygame.image.load(path)
+        self.image_rotate = pygame.transform.rotozoom(self.image_rotate, 0, .6)
+
+    def display(self, surface):
+        if not self.down:
+            self.reset_rect.center = self.rect.center
+            surface.blit(self.image, self.rect)
+        elif self.down and self.falling_countdown != 0:
+            if self.left:
+                self.pin_animation()
+                self.image_rotate = pygame.transform.flip(self.image_rotate, True, False)
+                surface.blit(self.image_rotate, (self.rect.centerx, self.rect.centery-self.falling_countdown))
+            elif self.right:
+                self.pin_animation()
+                surface.blit(self.image_rotate, (self.rect.centerx, self.rect.centery-self.falling_countdown))
+            self.falling_countdown -= 1
+
+    def test_if_ball_collusion(self, ball_x, ball_y):
+        if self.pin_range_low <= ball_x <= self.pin_range_high and abs(self.rect.y-ball_y) <= self.pin_height: # margin of error
+            self.knock_down(ball_x)
+            return True
+        return False
+    
+    def test_for_collateral(self):
+        probability_of_hit = np.random.randint(1, 100)  # need 80 to hit
+        logging.debug("probability of collateral: " + str(probability_of_hit))
+        if self.number in self.potential_knock_downs.keys() and probability_of_hit > 50:
+            # return number of pin to be knocked down
+            if self.left:
+                logging.debug("collateral pin: " + str(self.number) + "->" + str(self.potential_knock_downs[self.number][0]))
+                return self.potential_knock_downs[self.number][0]
+            elif self.right:
+                logging.debug("collateral pin: " + str(self.number) + "->" + str(self.potential_knock_downs[self.number][1]))
+                return self.potential_knock_downs[self.number][1]
+        return 0
+
+class AllPins:
+    cover_mapping = {
+        1: 5,
+        2: 8,
+        3: 9
+    }
+
+    def __init__(self, center_x, floor_y, pit_width):
+        # list to hold pins
+        self.all_pins = []
+
+                # 1->9
+                # 2->8 3->9
+                # 4 (5) 6
+                # 7 (8) (9) 10
+        self.image = pygame.image.load('pin_icon_positions/pin_icon_0.png')
+        self.image = pygame.transform.rotozoom(self.image, 0, .6)
+        pin_space = pit_width // 10 #- pin_width
+        x_values = [center_x,
+                    center_x-pin_space,
+                    center_x+pin_space,
+                    center_x - pin_space*2,
+                    center_x,
+                    center_x + pin_space * 2,
+                    center_x - pin_space * 3,
+                    center_x - pin_space,
+                    center_x + pin_space,
+                    center_x + pin_space * 3]
+
+        # for i in range(9, -1, -1):
+        for i in range(0, 10):
+            curr_x_val = x_values[i]
+            self.all_pins.append(Pin(i+1, curr_x_val + 1, floor_y))
+
+            self.pins_down = 0
+
+        # control sound effect for pins crashing
+        self.sound_effect = True
+
+    def reset_size(self, center_x, center_y, pit_width):
+        pin_space = pit_width // 10  # - pin_width
+        new_x_values = [center_x,
+                    center_x - pin_space,
+                    center_x + pin_space,
+                    center_x - pin_space * 2,
+                    center_x,
+                    center_x + pin_space * 2,
+                    center_x - pin_space * 3,
+                    center_x - pin_space,
+                    center_x + pin_space,
+                    center_x + pin_space * 3]
+
+        for i in range(9, -1, -1):
+            self.all_pins[i].rect.center = (new_x_values[i], center_y)
+            self.all_pins[i].reset_rect.center = self.all_pins[i].rect.center
+            self.all_pins[i].pin_range_low = self.all_pins[i].rect.centerx - self.all_pins[i].pin_width / 7
+            self.all_pins[i].pin_range_high = self.all_pins[i].rect.centerx + self.all_pins[i].pin_width / 7 + 20
+
+    def set_x_values(self, new_x_values):
+        for i in range(9, -1, -1):
+            self.all_pins[i].rect.x = new_x_values[i]
+            self.all_pins[i].reset_rect.center = self.all_pins[i].rect.center
+
+    def set_y_value(self, new_y_value):
+        for pin in self.all_pins:
+            pin.rect.y = new_y_value
+            pin.reset_rect.center = pin.rect.center
+
+    def display(self, surface, ball_x, ball_y):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_DOWN]:
+            self.reset_all()
+        else:
+            for pin in self.all_pins:
+                # check if ball hit pin
+                if not pin.down and pin.test_if_ball_collusion(ball_x, ball_y):
+                    ball_crash_sound = pygame.mixer.Sound("ball_pin_collusion.mp3")
+                    if self.sound_effect:
+                        pygame.mixer.Sound.play(ball_crash_sound)
+                    self.pins_down += 1
+
+                    # strike possibility
+                    if self.pins_down == 1 and (pin.number == 2 or pin.number == 3):
+                        probability_of_strike = np.random.randint(1, 100)
+                        # probability_of_strike = 100 # to check if strike is working properly
+                        if probability_of_strike > 85 and pin.number == 2:
+                            self.strike(True, False)
+                        elif probability_of_strike > 90 and pin.number == 3:
+                            self.strike(True, False)
+
+                    logging.debug("pin hit: " + str(pin.number))
+                    logging.debug("pins down: " + str(self.pins_down))
+
+                    # change hidden pins to active if needed
+                    if pin.number in [1,2,3]: # pins that cover others
+                        now_active = 0
+                        if pin.number == 1:
+                            now_active = 5
+                        elif pin.number == 2:
+                            now_active = 8
+                        elif pin.number == 3:
+                            now_active = 9
+
+                        # make active if not down, to avoid double count
+                        if not self.all_pins[now_active-1].down:
+                            self.all_pins[now_active-1].active = True
+
+                    # save number that will be hit
+                    collateral_num = pin.test_for_collateral()
+                    # while there is a collateral pin
+                    while collateral_num != 0 and not self.all_pins[collateral_num-1].down:
+                        self.pins_down += 1
+                        logging.debug("pins down: " + str(self.pins_down))
+                        self.all_pins[collateral_num-1].knock_down(pin.rect.centerx)
+                        collateral_num = pin.test_for_collateral()
+                pin.display(surface)
+                    # to check collusion
+                # if pin.active:
+                    # pin_rect = pin.image.get_rect()
+                    # pin_rect = pygame.Rect(pin.rect.centerx,pin.rect.centery,(pin.pin_range_high-pin.pin_range_low), pin.pin_height/2)
+                    # pin_rect.center = (pin.rect.centerx,pin.rect.centery)
+                    # pygame.draw.rect(surface, (250,250,0), pin_rect)
+
+    def reset_all(self):
+        self.pins_down = 0
+        for pin in self.all_pins:
+            # pygame.time.wait(20)
+            pin.reset()
+
+    def strike(self, left, right):
+        for pin in self.all_pins:
+            pin.down = True
+            pin.left = left
+            pin.right = right
+        self.pins_down = 10
+
+    def toggle_sound(self):
+        self.sound_effect = not self.sound_effect
+
+    def get_hit_coor_x(self):
+        x_vals = []
+        for pin in self.all_pins:
+            if pin.active:
+                x_vals.append([pin.pin_range_low, pin.pin_range_high])
+            else:
+                x_vals.append([0,0])
+        return x_vals
+
+    def get_hit_coor_y(self):
+        y_vals = []
+        for pin in self.all_pins:
+            if pin.active:
+                y_vals.append(pin.y)
+            else:
+                y_vals.append(0)
+        return y_vals

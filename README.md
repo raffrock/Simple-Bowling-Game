@@ -1,2 +1,2 @@
 # Simple-Bowling-Game
-I am attempting to make a bowling game in python. This is the prototype.
+Able to play multiple bowling games with score calculated at the top of the screen. Move ball with left or right arrows and roll with up arrow. Has animation for ball and pins. Has music and sound effects that can be turned on and off. Able to reset game (escape) or pins early (down arrow). Score accounts for strikes, spares, and extra rolls on tenth frame if applicable. Resizable. Close with backspace key.  

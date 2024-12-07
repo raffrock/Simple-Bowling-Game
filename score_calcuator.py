@@ -1,12 +1,10 @@
 # accept valid turn scores
-# store string for display
+# stores string for display
 
 class Score:
 
     def __init__(self):
         self.game_score = 0
-        self.curr_turn_list = []
-        self.curr_turn = 1
         self.roll_list = []
         self.game_end = False
 
@@ -52,8 +50,5 @@ class Score:
 
     def reset_score(self):
         self.game_score = 0
-        self.curr_turn_list = []
-        self.curr_turn = 1
         self.roll_list = []
-        # self.score_string = ""
 
