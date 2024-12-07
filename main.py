@@ -15,6 +15,8 @@ pygame.init()
 #   WHAT TO WORK ON NEXT:
     # make resizing better (ball and pins)
     # add more variety to pin knock down patterns
+        # randomize left and right to increase chances of more pins being down
+            # like create an option to inverse usual outcome based on randint
     # figure out how to display instructions_text
     # add ball rolling sound effect
     # redraw background
@@ -112,7 +114,7 @@ while True:
             # change ball color
             if event.key == pygame.K_c:
                 ball_color_count += 1
-                logging.debug("ball_color_count: " + str(ball_color_count))
+                # logging.debug("ball_color_count: " + str(ball_color_count))
                 if ball_color_count == 1:
                     ball.set_color("Green")
                 elif ball_color_count == 2:

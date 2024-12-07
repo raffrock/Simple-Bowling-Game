@@ -18,8 +18,11 @@ class Score:
         max_rolls = 20
         for i in range(0, len(self.roll_list)):
             if self.roll_list[i] != 10:
-                score_str += str(self.roll_list[i])
                 next_frame = not next_frame
+                if next_frame and self.roll_list[i] == self.roll_list[i-1]:
+                    score_str += "-"
+                else:
+                    score_str += str(self.roll_list[i])
             elif next_frame:
                 score_str += "X | " # strike
                 continue

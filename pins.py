@@ -108,14 +108,15 @@ class Pin:
         return False
     
     def test_for_collateral(self):
-        probability_of_hit = np.random.randint(1, 100)  # need 80 to hit
+        probability_of_hit = np.random.randint(1, 100)
+        random_factor = np.random.randint(1, 100) # 20% chance of unexpect behavior
         logging.debug("probability of collateral: " + str(probability_of_hit))
-        if self.number in self.potential_knock_downs.keys() and probability_of_hit > 50:
+        if self.number in self.potential_knock_downs.keys() and probability_of_hit > 40:
             # return number of pin to be knocked down
-            if self.left:
+            if (self.left and random_factor > 20) or (self.right and random_factor <= 20):
                 logging.debug("collateral pin: " + str(self.number) + "->" + str(self.potential_knock_downs[self.number][0]))
                 return self.potential_knock_downs[self.number][0]
-            elif self.right:
+            elif  (self.right and random_factor > 20) or (self.left and random_factor <= 20):
                 logging.debug("collateral pin: " + str(self.number) + "->" + str(self.potential_knock_downs[self.number][1]))
                 return self.potential_knock_downs[self.number][1]
         return 0
