@@ -14,18 +14,18 @@ class Ball():
         self.color = color
 
         if color == "Blue":
-            self.icon = pygame.image.load('blue_ball_animation/ball_icon_blue_one.png').convert_alpha()
+            self.image = pygame.image.load('blue_ball_animation/ball_icon_blue_one.png').convert_alpha()
         elif color == "Red":
-            self.icon = pygame.image.load('ball_icon_colors/ball_icon_red.png').convert_alpha()
+            self.image = pygame.image.load('ball_icon_colors/ball_icon_red.png').convert_alpha()
         elif color == "Green":
-            self.icon = pygame.image.load('green_ball_animation/ball_icon_green_one.png')
+            self.image = pygame.image.load('green_ball_animation/ball_icon_green_one.png')
         else: # color is purple
-            self.icon = pygame.image.load('ball_icon_colors/ball_icon_purple.png').convert_alpha()
-        self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
+            self.image = pygame.image.load('ball_icon_colors/ball_icon_purple.png').convert_alpha()
+        self.image = pygame.transform.rotozoom(self.image, 0, .5)
 
         # img rect for positioning and collusion
-        self.rect = self.icon.get_rect()
-        self.rect.center = (floor_x / 2 + 10, floor_y - self.icon.get_height() * .2)
+        self.rect = self.image.get_rect()
+        self.rect.center = (floor_x / 2 + 10, floor_y - self.image.get_height() * .2)
 
         # variables for reset
         self.reset_pos_x = self.rect.centerx
@@ -89,11 +89,11 @@ class Ball():
 
         # update icon to be next frame
         path += ".png"
-        self.icon = pygame.image.load(path).convert_alpha()
-        self.icon = pygame.transform.rotozoom(self.icon, 0, .5)
+        self.image = pygame.image.load(path).convert_alpha()
+        self.image = pygame.transform.rotozoom(self.image, 0, .5)
 
     def update_x_y(self, x, y):
-        self.rect.center = (x / 2 + 10, y - self.icon.get_height() * .2)
+        self.rect.center = (x / 2 + 10, y - self.image.get_height() * .2)
         self.reset_pos_x = self.rect.centerx
         self.reset_pos_y = self.rect.centery
 
@@ -121,9 +121,6 @@ class Ball():
             self.turn_counter = 0
 
         self.turn_counter += 1
-
-        # add animation for purple ball
-        # if self.color == "purple":
         self.color_animation(self.turn_counter)
 
         # reset to shooting position when collusion
@@ -132,7 +129,7 @@ class Ball():
             self.if_roll = False
             self.visible = False
             self.rect.center = (self.reset_pos_x, self.reset_pos_y)
-            # if self.color == "purple":
+            # reset to default image
             self.color_animation(1)
 
     # move function
@@ -160,7 +157,7 @@ class Ball():
         if self.visible or self.visible_countdown <= 0:
             self.visible_countdown = 20
             self.visible = True
-            surface.blit(self.icon, self.rect)
+            surface.blit(self.image, self.rect)
         if not self.visible:
             self.visible_countdown -= 1
 
